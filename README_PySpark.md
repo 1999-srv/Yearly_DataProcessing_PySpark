@@ -12,31 +12,31 @@ The data schema is defined explicitly using PySpark's StructType and StructField
 **Schema Definition:**
 A custom schema is defined for reading the CSV data, ensuring that each column is correctly typed.
 
-schema = StructType([
-    StructField("SalesOrderID", IntegerType(), True),
-    StructField("SalesOrderDetailID", IntegerType(), True),
-    ...
-    StructField("ModifiedDate", DateType(), True)
-])
+    schema = StructType([
+        StructField("SalesOrderID", IntegerType(), True),
+        StructField("SalesOrderDetailID", IntegerType(), True),
+        ...
+        StructField("ModifiedDate", DateType(), True)
+    ])
 
 **Data Loading:** The sales order data is loaded from the CSV file using the defined schema.
 
-df = spark.read.format('csv').option('header', 'false').schema(schema).load("/FileStore/tables/Sales_SalesOrderDetail.csv")
+    df = spark.read.format('csv').option('header', 'false').schema(schema).load("/FileStore/tables/Sales_SalesOrderDetail.csv")
 
 **Year Extraction:** A new column, OrderYear, is created by extracting the year from the ModifiedDate field.
 
-df = df.withColumn("OrderYear", year(col("ModifiedDate")))
+    df = df.withColumn("OrderYear", year(col("ModifiedDate")))
 
 **Create Yearly DataFrames:** The script identifies distinct years in the data and processes the records for each year. It subtracts one year from the ModifiedDate for comparison purposes using date_sub().
 
-df_previous_year = df_year.withColumn("PreviousYearDate", date_sub(col("ModifiedDate"), 365))
+    df_previous_year = df_year.withColumn("PreviousYearDate", date_sub(col("ModifiedDate"), 365))
 
 **Data Storage:** For each year, the resulting DataFrame is written to Delta format in separate tables.
 
-yearly_data[y].write.format("delta").mode("overwrite").saveAsTable(f"default.sales_data_{y}")
+    yearly_data[y].write.format("delta").mode("overwrite").saveAsTable(f"default.sales_data_{y}")
 
 **Example Output**
-The processed data for each year is saved as a Delta table, e.g., sales_data_2012.
+The processed data for each year is saved as a Delta table, e.g., **sales_data_2012.**
 
 # Usage Instructions
 Ensure PySpark and Delta Lake are configured correctly in your Spark environment.
