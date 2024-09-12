@@ -18,10 +18,9 @@ for y in years_list:
     FROM SalesData
     WHERE YEAR(ModifiedDate) = {y}
     """
-    
-    # Execute the query and save the results
-    df_year = spark.sql(query)
-    df_year.write.mode("overwrite").format("delta").saveAsTable(f"default.sales_data2_{y}", header=True)
+# Execute the query and save the results
+df_year = spark.sql(query)
+df_year.write.mode("overwrite").format("delta").saveAsTable(f"default.sales_data2_{y}", header=True)
 
 # Output
 Separate Delta tables are created for each year, named sales_data2_<year>.
