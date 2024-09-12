@@ -8,23 +8,23 @@ The SalesData table, which contains sales order details with a ModifiedDate fiel
 # Overview
 **Extract Unique Years:** The script extracts distinct years from the ModifiedDate column in the SalesData table using a SQL query.
 
-SELECT DISTINCT YEAR(ModifiedDate) AS OrderYear
-FROM SalesData
+    SELECT DISTINCT YEAR(ModifiedDate) AS OrderYear
+    FROM SalesData
 
 **Process Data for Each Year:** For each year, the script performs the following:It queries the sales data for that specific year.It creates a new column, PreviousYearDate, by subtracting 365 days from the ModifiedDate.The result is saved as a Delta table with the naming convention sales_data2_<year>.
 
-for y in years_list:
-    query = f"""
-    SELECT *, 
-           YEAR(ModifiedDate) AS OrderYear, 
-           DATE_SUB(ModifiedDate, 365) AS PreviousYearDate
-    FROM SalesData
-    WHERE YEAR(ModifiedDate) = {y}
-    """
+    for y in years_list:
+        query = f"""
+        SELECT *, 
+               YEAR(ModifiedDate) AS OrderYear, 
+               DATE_SUB(ModifiedDate, 365) AS PreviousYearDate
+        FROM SalesData
+        WHERE YEAR(ModifiedDate) = {y}
+        """
 # Execute the query and save the results
 
-df_year = spark.sql(query)
-df_year.write.mode("overwrite").format("delta").saveAsTable(f"default.sales_data2_{y}", header=True)
+    df_year = spark.sql(query)
+    df_year.write.mode("overwrite").format("delta").saveAsTable(f"default.sales_data2_{y}", header=True)
 
 # Output
 Separate Delta tables are created for each year, named sales_data2_<year>.
